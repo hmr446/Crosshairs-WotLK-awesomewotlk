@@ -1,5 +1,6 @@
-local LibNameplates = LibStub("LibNameplates-1.0")
-if not LibNameplates then return end
+--local LibNameplates = LibStub("LibNameplates-1.0")
+--if not LibNameplates then return end
+--此版本归功于bkader，我只是基于awesome得api使用正式服得代码改写。oliveria
 
 local alpha = 0.75 -- Overall alpha
 local speed = 0.1 -- seconds to fade textures in and out
@@ -127,68 +128,79 @@ end
 SetLineAlpha(lineAlpha)
 
 -- fade in if our crosshairs weren't visible
+-- fade in if our crosshairs weren't visible
+local Moving = false
 local function FocusPlate(plate)
 	f:ClearAllPoints()
 	f:SetPoint("CENTER", plate)
 	f:Show()
 	f.plate = plate
-
+	
 	local r, g, b = 1, 1, 1
-	if UnitIsTapped("target") and not UnitIsTappedByPlayer("target") then
+	--if UnitIsTapped('target') and not UnitIsTappedByPlayer('target') and not UnitIsTappedByAllThreatList('target') then
+	if UnitIsTapDenied('target') then
+		--SetColor(0.5, 0.5, 0.5)
 		r, g, b = 0.5, 0.5, 0.5
-	elseif UnitIsPlayer("target") then
-		local _, class = UnitClass("target")
+	elseif UnitIsPlayer('target') then
+		local _, class = UnitClass('target')
 		if class and RAID_CLASS_COLORS[class] then
 			local colors = RAID_CLASS_COLORS[class]
 			r, g, b = colors.r, colors.g, colors.b
 		else
-			r, g, b = 0.274, 0.705, 0.392
+			r, g, b = 0.274, 0.705, 0.392 --70/255,  180/255, 100/255
 		end
+	--seif UnitIsOtherPlayersPet('target') then
+		-- g, b = 0.6, 0.6, 0.6
 	else
-		r, g, b = UnitSelectionColor("target")
+		r, g, b = UnitSelectionColor('target')
 	end
 	SetColor(r, g, b)
+	
+	
+	--Moving = GetTime()
 end
 
 function f:PLAYER_TARGET_CHANGED()
-	if UnitExists("target") then
-		local nameplate = LibNameplates:GetNameplateByGUID(UnitGUID("target"))
-		if nameplate then
-			FocusPlate(nameplate)
-			return
-		end
-	end
+	local nameplate = C_NamePlate.GetNamePlateForUnit('target') --f:GetPlateByGUID(targetGUID)
+	if nameplate then
+		FocusPlate(nameplate)
+		--rgetLock:Show()
+	else
 	self.plate = nil
 	self:Hide()
-end
-
-function f:LibNameplates_FoundGUID(_, nameplate, guid, unit)
-	if nameplate and UnitIsUnit("target", unit) then
-		FocusPlate(nameplate)
 	end
 end
+f:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-function f:LibNameplates_RecycleNameplate(_, nameplate)
-	if nameplate and self.plate == nameplate then
+function f:PLAYER_ENTERING_WORLD()
+	-- PLAYER_TARGET_CHANGED doesn't fire when you lose your target from zoning
+	self:PLAYER_TARGET_CHANGED()
+end
+f:RegisterEvent('PLAYER_ENTERING_WORLD')
+
+local xFactor, yFactor = 1, 1 -- pixel perfect stuff, just try and prevent it from screwing up our lines
+function ScaleCoords(xPixel, yPixel, trueScale)
+	local x, y  = xPixel / xFactor, yPixel / yFactor
+	x, y = x - x % 1, y - y % 1 -- floor
+	return trueScale and (xPixel * xFactor) or (x * xFactor), trueScale and (xPixel * xFactor) or (y * yFactor)
+end
+
+function f:NAME_PLATE_UNIT_ADDED(unit)
+	local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
+	if nameplate and UnitIsUnit('target', unit) then
+		FocusPlate(nameplate)
+		--rgetLock:Show()
+	end
+end
+f:RegisterEvent('NAME_PLATE_UNIT_ADDED')
+
+function f:NAME_PLATE_UNIT_REMOVED(unit)
+	local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
+	if UnitIsUnit('target', unit) then
 		self.plate = nil
 		self:Hide()
 	end
 end
+f:RegisterEvent('NAME_PLATE_UNIT_REMOVED')
 
-function f:ADDON_LOADED(name)
-	if name == "Crosshairs" then
-		self:UnregisterEvent("ADDON_LOADED")
-		self:RegisterEvent("PLAYER_ENTERING_WORLD")
-		LibNameplates.RegisterCallback(self, "LibNameplates_FoundGUID")
-		LibNameplates.RegisterCallback(self, "LibNameplates_RecycleNameplate")
-	end
-end
-
-function f:PLAYER_ENTERING_WORLD()
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	self:PLAYER_TARGET_CHANGED()
-end
-f:RegisterEvent("ADDON_LOADED")
-
-f:SetScript("OnEvent", function(self, event, ...) return self[event] and self[event](self, ...) end)
+f:SetScript('OnEvent', function(self, event, ...) return self[event] and self[event](self, ...) end)
