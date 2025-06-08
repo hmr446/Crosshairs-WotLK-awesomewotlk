@@ -1,22 +1,22 @@
 --local LibNameplates = LibStub("LibNameplates-1.0")
 --if not LibNameplates then return end
---This version credits bkader, I just rewrote the code for retail using awesome API. - oliveria
+--此版本归功于bkader，我只是基于awesome得api使用正式服得代码改写。oliveria
 
 local alpha = 0.75 -- Overall alpha
 local speed = 0.1 -- seconds to fade textures in and out
 local lineAlpha = 0.5 -- Set to 0 to hide lines but keep the circle
 
--- Add anchor point offset variables
-local offsetX = 0   -- Horizontal offset (positive = right, negative = left)
-local offsetY = 15  -- Vertical offset (positive = up, negative = down)
+-- 添加锚点位置偏移变量
+local offsetX = 0   -- 水平偏移量（正数向右，负数向左）
+local offsetY = 15  -- 垂直偏移量（正数向上，负数向下）
+-- 添加焦点框架偏移变量
+local focusOffsetY = 20  -- 焦点框架垂直偏移（正数向上，负数向下）
 
-local focusOffsetY = 20 
-
--- Focus target highlight settings
-local focusAlpha = 0.9 -- Focus border transparency
-local focusBorderWidth = 80   -- Focus border width
-local focusBorderHeight = 20  -- Focus border height
-local focusBorderTexture = [[Interface\AddOns\Crosshairs\Media\nameplate_glow]] -- Path to your border texture
+-- 焦点目标高亮设置
+local focusAlpha = 0.9 -- 焦点边框透明度
+local focusBorderWidth = 80   -- 焦点边框宽度
+local focusBorderHeight = 20  -- 焦点边框高度
+local focusBorderTexture = [[Interface\AddOns\Crosshairs\Media\nameplate_glow]] -- 替换为您的边框材质路径
 
 local UIFrameFadeIn = UIFrameFadeIn
 local CreateFrame = CreateFrame
@@ -36,15 +36,15 @@ local function GetPhysicalScreenSize()
     return tonumber(width), tonumber(height)
 end
 
--- Create main crosshair frame
+-- 创建主准星框架
 local f = CreateFrame("frame", "Crosshairs", UIParent)
 f:SetFrameLevel(0)
 f:SetFrameStrata("BACKGROUND")
 f:SetPoint("CENTER")
 
--- Create focus target highlight frame
+-- 创建焦点目标高亮框架
 local focusFrame = CreateFrame("frame", "CrosshairsFocus", UIParent)
-focusFrame:SetFrameLevel(1) -- Slightly higher than crosshair
+focusFrame:SetFrameLevel(1)
 focusFrame:SetFrameStrata("BACKGROUND")
 focusFrame:Hide()
 
@@ -56,7 +56,8 @@ end
 local lineWidth = uiScale * 2
 f:SetSize(64 * uiScale, 64 * uiScale)
 
--- Calculate focus frame size
+
+-- 修改焦点框架大小计算
 local focusWidth = 64 * uiScale + focusBorderWidth * 2
 local focusHeight = 64 * uiScale + focusBorderHeight * 2
 focusFrame:SetSize(focusWidth, focusHeight)
@@ -66,7 +67,7 @@ circle:SetTexture([[Interface\AddOns\Crosshairs\circle]])
 circle:SetAllPoints(f)
 circle:SetAlpha(alpha)
 
--- Create focus border texture
+-- 创建焦点边框纹理
 local focusBorder = focusFrame:CreateTexture(nil, "OVERLAY")
 focusBorder:SetTexture(focusBorderTexture)
 focusBorder:SetAllPoints(focusFrame)
@@ -113,10 +114,10 @@ rotation:SetDegrees(-360)
 rotation:SetDuration(5)
 ag:SetLooping("REPEAT")
 
--- Focus border animation group
+-- 焦点边框动画组
 local focusAg = focusBorder:CreateAnimationGroup()
 local focusScale = focusAg:CreateAnimation("Scale")
-focusScale:SetScale(1.05, 1.05)
+focusScale:SetScale(1, 1)
 focusScale:SetDuration(1)
 focusScale:SetSmoothing("IN_OUT")
 local focusAlphaAnim = focusAg:CreateAnimation("Alpha")
@@ -169,10 +170,11 @@ local function SetFocusColor(r, g, b)
     focusBorder:SetVertexColor(r, g, b)
 end
 
--- Focus target highlight function
+-- 焦点目标高亮函数
 local function FocusHighlight(plate, isFocus)
     if isFocus then
         focusFrame:ClearAllPoints()
+        -- 添加垂直偏移量到焦点框架
         focusFrame:SetPoint("CENTER", plate, 0, focusOffsetY)
         focusFrame:Show()
         focusBorder:SetAlpha(focusAlpha)
@@ -185,10 +187,10 @@ local function FocusHighlight(plate, isFocus)
                 local colors = RAID_CLASS_COLORS[class]
                 r, g, b = colors.r, colors.g, colors.b
             else
-                r, g, b = 1, 0.84, 0 -- Gold focus border
+                r, g, b = 1, 0.84, 0 -- 金色焦点边框
             end
         else
-            r, g, b = 0, 1, 1 -- Cyan focus border
+            r, g, b = 0, 1, 1 -- 青色焦点边框
         end
         SetFocusColor(r, g, b)
     else
@@ -196,10 +198,10 @@ local function FocusHighlight(plate, isFocus)
     end
 end
 
--- Position target crosshair
+-- 调整目标准星位置
 local function FocusPlate(plate)
     f:ClearAllPoints()
-    -- Apply offset to anchor position
+    -- 应用偏移量到锚点位置
     f:SetPoint("CENTER", plate, offsetX, offsetY)
     f:Show()
     f.plate = plate
@@ -232,7 +234,7 @@ function f:PLAYER_TARGET_CHANGED()
 end
 f:RegisterEvent('PLAYER_TARGET_CHANGED')
 
--- Focus target changed event
+-- 焦点目标变化事件
 function f:PLAYER_FOCUS_CHANGED()
     local focusPlate = C_NamePlate.GetNamePlateForUnit('focus')
     if focusPlate then
@@ -283,34 +285,3 @@ f:RegisterEvent('NAME_PLATE_UNIT_REMOVED')
 f:SetScript('OnEvent', function(self, event, ...) 
     return self[event] and self[event](self, ...) 
 end)
-
--- Add slash command for dynamic focus size adjustment
-SLASH_FOCUSSIZE1 = "/fsize"
-SlashCmdList["FOCUSSIZE"] = function(size)
-    local width, height = strmatch(size, "(%d+)[xX](%d+)")
-    width = tonumber(width)
-    height = tonumber(height)
-    
-    if width and height and width > 0 and height > 0 then
-        focusBorderWidth = width
-        focusBorderHeight = height
-        
-        -- Update current focus frame size
-        local newFocusWidth = 64 * uiScale + focusBorderWidth * 2
-        local newFocusHeight = 64 * uiScale + focusBorderHeight * 2
-        focusFrame:SetSize(newFocusWidth, newFocusHeight)
-        
-        -- Refresh current focus position
-        if focusFrame:IsShown() then
-            local plate = C_NamePlate.GetNamePlateForUnit('focus')
-            if plate then
-                focusFrame:ClearAllPoints()
-                focusFrame:SetPoint("CENTER", plate)
-            end
-        end
-        
-        print(string.format("Focus border size set to: %dx%d", width, height))
-    else
-        print("Usage: /fsize [width]x[height] (e.g. /fsize 25x30)")
-    end
-end
