@@ -7,4 +7,5 @@ https://user-images.githubusercontent.com/4732702/140928916-d6b42a0b-51fc-4c90-a
 Im use kuinameplate， https://github.com/Macumbafeh/KuiNameplates-WoTLK
 This is just my personal preference setting.
 
-![R )5OYV$ PE{ZR~Y$Y`C$N](https://github.com/user-attachments/assets/15dcac07-2d77-4013-8ffe-3a2267b05e5e)
+![@F3S_M`T~G OAPXMG%O5PY1](https://github.com/user-attachments/assets/1ffb8691-7458-4908-af38-0294d170281c)
+
