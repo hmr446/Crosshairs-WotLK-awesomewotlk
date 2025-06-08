@@ -1,10 +1,14 @@
---local LibNameplates = LibStub("LibNameplates-1.0")
+local LibNameplates = LibStub("LibNameplates-1.0")
 --if not LibNameplates then return end
 --此版本归功于bkader，我只是基于awesome得api使用正式服得代码改写。oliveria
 
 local alpha = 0.75 -- Overall alpha
 local speed = 0.1 -- seconds to fade textures in and out
 local lineAlpha = 0.5 -- Set to 0 to hide lines but keep the circle
+
+-- 添加锚点位置偏移变量
+local offsetX = 0   -- 水平偏移量（正数向右，负数向左）
+local offsetY = 30  -- 垂直偏移量（正数向上，负数向下）
 
 local UIFrameFadeIn = UIFrameFadeIn
 local CreateFrame = CreateFrame
@@ -29,7 +33,9 @@ f:SetFrameLevel(0)
 f:SetFrameStrata("BACKGROUND")
 f:SetPoint("CENTER")
 
-local uiScale = 1
+
+
+local uiScale = 2
 local screen_size = {GetPhysicalScreenSize()}
 if screen_size and screen_size[2] then
 	uiScale = 768 / screen_size[2]
@@ -132,7 +138,7 @@ SetLineAlpha(lineAlpha)
 local Moving = false
 local function FocusPlate(plate)
 	f:ClearAllPoints()
-	f:SetPoint("CENTER", plate)
+    f:SetPoint("CENTER", plate, offsetX, offsetY)
 	f:Show()
 	f.plate = plate
 	
