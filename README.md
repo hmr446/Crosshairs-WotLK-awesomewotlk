@@ -1,5 +1,5 @@
 # Crosshairs for WotLK (9.0.2.0)
-
+Need use awesomewotlk https://github.com/FrostAtom/awesome_wotlk
 Adds an animated crosshair to your target's nameplate for better visibility.
 
 https://user-images.githubusercontent.com/4732702/140928916-d6b42a0b-51fc-4c90-a221-45df7024b8e6.mp4
