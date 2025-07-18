@@ -5,5 +5,5 @@
 ## Notes: Animated target indicator
 ## X-Date: 2022-05-18 @ 12:08 PM |cff808080UTC|r
 
-Embeds.xml
+
 Crosshairs.lua
