@@ -1,14 +1,13 @@
-local LibNameplates = LibStub("LibNameplates-1.0")
 --if not LibNameplates then return end
---此版本归功于bkader，我只是基于awesome得api使用正式服得代码改写。oliveria
+--姝ょ増鏈綊鍔熶簬bkader锛屾垜鍙槸鍩轰簬awesome寰梐pi浣跨敤姝ｅ紡鏈嶅緱浠ｇ爜鏀瑰啓銆俹liveria
 
 local alpha = 0.75 -- Overall alpha
 local speed = 0.1 -- seconds to fade textures in and out
 local lineAlpha = 0.5 -- Set to 0 to hide lines but keep the circle
 
--- 添加锚点位置偏移变量
-local offsetX = 0   -- 水平偏移量（正数向右，负数向左）
-local offsetY = 30  -- 垂直偏移量（正数向上，负数向下）
+-- 娣诲姞閿氱偣浣嶇疆鍋忕Щ鍙橀噺
+local offsetX = 0   -- 姘村钩鍋忕Щ閲忥紙姝ｆ暟鍚戝彸锛岃礋鏁板悜宸︼級
+local offsetY = 30  -- 鍨傜洿鍋忕Щ閲忥紙姝ｆ暟鍚戜笂锛岃礋鏁板悜涓嬶級
 
 local UIFrameFadeIn = UIFrameFadeIn
 local CreateFrame = CreateFrame
